@@ -192,19 +192,28 @@ def build_tabla_compacta(grouped, group_col, name_col, label, mc_label):
 
     for per in PERIODOS_ORDEN:
         s = S[per]
-        f_per = F[per]
         pl = plabel(per, mc_label)
         if s['acc'] in grouped.columns and s['meta'] in grouped.columns:
-            t[f'{pl} 🚦'] = grouped.apply(lambda r: semaforo(r.get(s['acc'],0), r.get(s['meta'],0)), axis=1)
-            t[f'{pl} Acc'] = grouped[s['acc']].astype(int)
-            t[f'{pl} Meta'] = grouped[s['meta']].astype(int)
-            t[f'{pl} %'] = grouped.apply(lambda r: cumpl(r.get(s['acc'],0), r.get(s['meta'],0)), axis=1)
-        if s['ctp'] in grouped.columns:
-            t[f'{pl} CTP'] = grouped[s['ctp']].astype(int)
-        if f_per['real_ctp'] in grouped.columns:
-            t[f'{pl} Real CTP'] = grouped[f_per['real_ctp']].astype(int)
-        if f_per['meta_ctp'] in grouped.columns:
-            t[f'{pl} Meta CTP'] = grouped[f_per['meta_ctp']].astype(int)
+            def fmt_acc(r, _s=s):
+                acc = int(r.get(_s['acc'], 0))
+                meta = int(r.get(_s['meta'], 0))
+                sem = semaforo(acc, meta)
+                pct = cumpl(acc, meta)
+                return f"{sem} {acc:,} / {meta:,} ({pct})"
+            t[f'Acc {pl}'] = grouped.apply(fmt_acc, axis=1)
+
+    for per in PERIODOS_ORDEN:
+        s = S[per]
+        f_per = F[per]
+        pl = plabel(per, mc_label)
+        if s['ctp'] in grouped.columns and f_per['real_ctp'] in grouped.columns and f_per['meta_ctp'] in grouped.columns:
+            def fmt_ctp(r, _s=s, _f=f_per):
+                ctp = int(r.get(_s['ctp'], 0))
+                real = int(r.get(_f['real_ctp'], 0))
+                meta = int(r.get(_f['meta_ctp'], 0))
+                sem = semaforo(real, meta)
+                return f"{sem} {ctp:,} (R:{real:,} / M:{meta:,})"
+            t[f'CTP {pl}'] = grouped.apply(fmt_ctp, axis=1)
 
     ytd_s = S['YTD']
     if ytd_s['dp'] in grouped.columns:
@@ -214,9 +223,10 @@ def build_tabla_compacta(grouped, group_col, name_col, label, mc_label):
     if ytd_s['graves'] in grouped.columns:
         t['Grav YTD'] = grouped[ytd_s['graves']].astype(int)
 
-    mc_acc_col = f'{mc_label} Acc'
-    if mc_acc_col in t.columns:
-        t = t.sort_values(mc_acc_col, ascending=False)
+    mc_col = f'Acc {mc_label}'
+    if mc_col in t.columns:
+        t['_sort'] = grouped[S['MC']['acc']].astype(float) if S['MC']['acc'] in grouped.columns else 0
+        t = t.sort_values('_sort', ascending=False).drop(columns='_sort')
     return t
 
 def build_top_empresas(df_nivel, p_key, tipo_cartera, n=10):
