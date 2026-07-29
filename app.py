@@ -192,15 +192,16 @@ def build_tabla_compacta(grouped, group_col, name_col, label, mc_label):
 
     for per in PERIODOS_ORDEN:
         s = S[per]
+        f_per = F[per]
         pl = plabel(per, mc_label)
-        if s['acc'] in grouped.columns and s['meta'] in grouped.columns:
-            def fmt_acc(r, _s=s):
-                acc = int(r.get(_s['acc'], 0))
-                meta = int(r.get(_s['meta'], 0))
-                sem = semaforo(acc, meta)
-                pct = cumpl(acc, meta)
-                return f"{sem} {acc:,} / {meta:,} ({pct})"
-            t[f'Acc {pl}'] = grouped.apply(fmt_acc, axis=1)
+        if f_per['real_ctp'] in grouped.columns and f_per['meta_ctp'] in grouped.columns:
+            def fmt_ctp(r, _f=f_per):
+                real = int(r.get(_f['real_ctp'], 0))
+                meta = int(r.get(_f['meta_ctp'], 0))
+                sem = semaforo(real, meta)
+                pct = cumpl(real, meta)
+                return f"{sem} {real:,} / {meta:,} ({pct})"
+            t[f'CTP {pl}'] = grouped.apply(fmt_ctp, axis=1)
 
     for per in PERIODOS_ORDEN:
         s = S[per]
