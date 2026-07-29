@@ -35,16 +35,16 @@ usuarios = {
 
     # ---- ADMINISTRADORES ----
     "cata": {
-        "name": "Catalina Araya",
-        "email": "charayay@achs.cl",
+        "name": "Catalina Arayay",
+        "email": "carayay@achs.cl",
         "password": hash_password("admin2026"),
         "rol": "admin",
         "territorio": None,
         "subgerencia": None,
     },
-    "Javiera Cabalin": {
-        "name": "J. Cabalin",
-        "email": "jicabalinf@achs.cl",
+    "diego": {
+        "name": "Diego (BI)",
+        "email": "diego@achs.cl",
         "password": hash_password("admin2026"),
         "rol": "admin",
         "territorio": None,
@@ -52,25 +52,25 @@ usuarios = {
     },
 
     # ---- JEFATURAS TERRITORIO ----
-    "terr_metro": {
-        "name": "Territorial Metro",
-        "email": "rmunita@achs.cl",
+    "jef_metro": {
+        "name": "Jefatura Metropolitano",
+        "email": "jef.metro@achs.cl",
         "password": hash_password("metro2026"),
         "rol": "jefatura",
         "territorio": "GRTR1010",
         "subgerencia": None,
     },
-    "terr_norte": {
-        "name": "Territorial Norte",
-        "email": "pariojaz@achs.cl",
+    "jef_norte": {
+        "name": "Jefatura Norte",
+        "email": "jef.norte@achs.cl",
         "password": hash_password("norte2026"),
         "rol": "jefatura",
         "territorio": "GRTR1020",
         "subgerencia": None,
     },
-    "terr_sur": {
-        "name": "Territorial Sur",
-        "email": "jbaumann@achs.cl",
+    "jef_sur": {
+        "name": "Jefatura Sur",
+        "email": "jef.sur@achs.cl",
         "password": hash_password("sur2026"),
         "rol": "jefatura",
         "territorio": "GRTR1030",
@@ -80,7 +80,7 @@ usuarios = {
     # ---- JEFATURA MIPE ----
     "laura_sierra": {
         "name": "Laura Sierra",
-        "email": "lcsierras@achs.cl",
+        "email": "lsierra@achs.cl",
         "password": hash_password("mipe2026"),
         "rol": "jefatura",
         "territorio": "SGMP0001",
