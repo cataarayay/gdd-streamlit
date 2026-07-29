@@ -1,0 +1,15 @@
+cookie:
+  expiry_days: 30
+  key: gdd_achs_cookie_key_2026
+  name: gdd_auth
+credentials:
+  usernames:
+    admin:
+      email: admin@achs.cl
+      name: Administrador
+      password: $2b$12$3XxjS0dtI8Jjr4YJ27.6yeqLxfrtyE5aau2b6DRX7QfUMwTz1iWWy
+      rol: admin
+      subgerencia: null
+      territorio: null
+pre-authorized:
+  emails: []
