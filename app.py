@@ -183,7 +183,8 @@ def agrupar(df, group_col, name_col):
         agg_dict[name_col] = 'first'
     return df.groupby(group_col, dropna=False).agg(agg_dict).reset_index()
 
-def build_tabla_compacta(grouped, group_col, name_col, label, mc_label):
+def build_tabla_acc(grouped, group_col, name_col, label, mc_label):
+    """Tabla Accidentes Totales: 🟡 782 / 811 (96%) por período + Fat/Grav YTD"""
     t = pd.DataFrame()
     if name_col and name_col in grouped.columns and name_col != group_col:
         t[label] = grouped[name_col].astype(str)
@@ -192,6 +193,37 @@ def build_tabla_compacta(grouped, group_col, name_col, label, mc_label):
 
     for per in PERIODOS_ORDEN:
         s = S[per]
+        pl = plabel(per, mc_label)
+        if s['acc'] in grouped.columns and s['meta'] in grouped.columns:
+            def fmt_acc(r, _s=s):
+                acc = int(r.get(_s['acc'], 0))
+                meta = int(r.get(_s['meta'], 0))
+                sem = semaforo(acc, meta)
+                pct = cumpl(acc, meta)
+                return f"{sem} {acc:,} / {meta:,} ({pct})"
+            t[f'{pl}'] = grouped.apply(fmt_acc, axis=1)
+
+    ytd_s = S['YTD']
+    if ytd_s['fatales'] in grouped.columns:
+        t['Fat YTD'] = grouped[ytd_s['fatales']].astype(int)
+    if ytd_s['graves'] in grouped.columns:
+        t['Grav YTD'] = grouped[ytd_s['graves']].astype(int)
+
+    mc_col = plabel('MC', mc_label)
+    if mc_col in t.columns:
+        t['_sort'] = grouped[S['MC']['acc']].astype(float) if S['MC']['acc'] in grouped.columns else 0
+        t = t.sort_values('_sort', ascending=False).drop(columns='_sort')
+    return t
+
+def build_tabla_ctp(grouped, group_col, name_col, label, mc_label):
+    """Tabla CTP: 🟢 745 / 893 (83%) por período + DP"""
+    t = pd.DataFrame()
+    if name_col and name_col in grouped.columns and name_col != group_col:
+        t[label] = grouped[name_col].astype(str)
+    else:
+        t[label] = grouped[group_col].astype(str)
+
+    for per in PERIODOS_ORDEN:
         f_per = F[per]
         pl = plabel(per, mc_label)
         if f_per['real_ctp'] in grouped.columns and f_per['meta_ctp'] in grouped.columns:
@@ -201,32 +233,17 @@ def build_tabla_compacta(grouped, group_col, name_col, label, mc_label):
                 sem = semaforo(real, meta)
                 pct = cumpl(real, meta)
                 return f"{sem} {real:,} / {meta:,} ({pct})"
-            t[f'CTP {pl}'] = grouped.apply(fmt_ctp, axis=1)
+            t[f'{pl}'] = grouped.apply(fmt_ctp, axis=1)
 
     for per in PERIODOS_ORDEN:
         s = S[per]
-        f_per = F[per]
         pl = plabel(per, mc_label)
-        if s['ctp'] in grouped.columns and f_per['real_ctp'] in grouped.columns and f_per['meta_ctp'] in grouped.columns:
-            def fmt_ctp(r, _s=s, _f=f_per):
-                ctp = int(r.get(_s['ctp'], 0))
-                real = int(r.get(_f['real_ctp'], 0))
-                meta = int(r.get(_f['meta_ctp'], 0))
-                sem = semaforo(real, meta)
-                return f"{sem} {ctp:,} (R:{real:,} / M:{meta:,})"
-            t[f'CTP {pl}'] = grouped.apply(fmt_ctp, axis=1)
+        if s['dp'] in grouped.columns:
+            t[f'DP {pl}'] = grouped[s['dp']].astype(int)
 
-    ytd_s = S['YTD']
-    if ytd_s['dp'] in grouped.columns:
-        t['DP YTD'] = grouped[ytd_s['dp']].astype(int)
-    if ytd_s['fatales'] in grouped.columns:
-        t['Fat YTD'] = grouped[ytd_s['fatales']].astype(int)
-    if ytd_s['graves'] in grouped.columns:
-        t['Grav YTD'] = grouped[ytd_s['graves']].astype(int)
-
-    mc_col = f'Acc {mc_label}'
+    mc_col = plabel('MC', mc_label)
     if mc_col in t.columns:
-        t['_sort'] = grouped[S['MC']['acc']].astype(float) if S['MC']['acc'] in grouped.columns else 0
+        t['_sort'] = grouped[F['MC']['real_ctp']].astype(float) if F['MC']['real_ctp'] in grouped.columns else 0
         t = t.sort_values('_sort', ascending=False).drop(columns='_sort')
     return t
 
