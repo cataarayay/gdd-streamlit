@@ -405,53 +405,40 @@ if seccion == "📊 Accidentabilidad":
     if is_mipe:
         st.markdown('<div class="mipe-banner">📋 Vista MIPE — Subgerencia SGMP0001</div>', unsafe_allow_html=True)
 
-    # === VISTA ===
+   # === VISTA ===
     if sel_jgc_cod:
         df_show = get_nivel(df, 'EXPERTO')[lambda d: d[COL_JGC]==sel_jgc_cod]
         grouped = agrupar(df_show, COL_EXP, COL_EXP_NOM)
-        display = build_tabla_compacta(grouped, COL_EXP, COL_EXP_NOM, "Experto", mc_label)
+        gc, nc, lb = COL_EXP, COL_EXP_NOM, "Experto"
         nivel_empresas = 'EXPERTO'; filtro_empresas = {COL_JGC: sel_jgc_cod}
     elif sel_ag not in ["Todas","—"]:
         df_show = get_nivel(df, 'JGC')[lambda d: d[COL_AGENCIA]==sel_ag]
         if is_mipe: df_show = df_show[df_show[COL_SUBG]=='SGMP0001']
         grouped = agrupar(df_show, COL_JGC, COL_JGC_NOM)
-        display = build_tabla_compacta(grouped, COL_JGC, COL_JGC_NOM, "JGC", mc_label)
+        gc, nc, lb = COL_JGC, COL_JGC_NOM, "JGC"
         nivel_empresas = 'JGC'; filtro_empresas = {COL_AGENCIA: sel_ag}
     elif sel_subg_cod:
         niv = 'AGENCIA_MIPE' if is_mipe else 'AGENCIA'
         df_show = get_nivel(df, niv)[lambda d: d[COL_SUBG]==sel_subg_cod]
         grouped = agrupar(df_show, COL_AGENCIA, COL_AGENCIA)
-        display = build_tabla_compacta(grouped, COL_AGENCIA, None, "Agencia", mc_label)
+        gc, nc, lb = COL_AGENCIA, None, "Agencia"
         nivel_empresas = niv; filtro_empresas = {COL_SUBG: sel_subg_cod}
     elif sel_ter_cod:
         df_show = get_nivel(df, 'SUBG')[lambda d: d[COL_GTE]==sel_ter_cod]
         grouped = agrupar(df_show, COL_SUBG, COL_SUBG_NOM)
-        display = build_tabla_compacta(grouped, COL_SUBG, COL_SUBG_NOM, "Subgerencia", mc_label)
+        gc, nc, lb = COL_SUBG, COL_SUBG_NOM, "Subgerencia"
         nivel_empresas = 'SUBG'; filtro_empresas = {COL_GTE: sel_ter_cod}
     elif is_mipe:
         df_show = get_nivel(df, 'AGENCIA_MIPE')[lambda d: d[COL_SUBG]=='SGMP0001']
         grouped = agrupar(df_show, COL_AGENCIA, COL_AGENCIA)
-        display = build_tabla_compacta(grouped, COL_AGENCIA, None, "Agencia MIPE", mc_label)
+        gc, nc, lb = COL_AGENCIA, None, "Agencia MIPE"
         nivel_empresas = 'AGENCIA_MIPE'; filtro_empresas = {COL_SUBG: 'SGMP0001'}
     else:
         grouped_ter = agrupar(df_gte.dropna(subset=[COL_GTE]), COL_GTE, COL_GTE_NOM)
-        display_ter = build_tabla_compacta(grouped_ter, COL_GTE, COL_GTE_NOM, "Territorio", mc_label)
         df_mipe = get_nivel(df, 'AGENCIA_MIPE')[lambda d: d[COL_SUBG]=='SGMP0001']
-        grouped_mipe = agrupar(df_mipe, COL_SUBG, COL_SUBG_NOM)
-        display_mipe = build_tabla_compacta(grouped_mipe, COL_SUBG, COL_SUBG_NOM, "Territorio", mc_label)
-        if len(display_mipe) > 0:
-            display_mipe.iloc[0, display_mipe.columns.get_loc("Territorio")] = "MIPE (SGMP0001)"
-        for col in display_ter.columns:
-            if col not in display_mipe.columns: display_mipe[col] = 0
-        display_mipe = display_mipe[display_ter.columns]
-        display = pd.concat([display_ter, display_mipe], ignore_index=True)
-        nivel_empresas = 'GTE'; filtro_empresas = {}
+        grouped_mipe =
 
-    # === TABLA ===
-    st.markdown(f'<div class="section-title">Accidentes Totales — {len(display)} filas</div>', unsafe_allow_html=True)
-    st.dataframe(display, use_container_width=True, height=min(500, 45 + len(display) * 35), hide_index=True)
-
-   
+    
     # === TOP 10 EMPRESAS ===
     st.divider()
     st.subheader("🏢 Top 10 empresas con más accidentes")
