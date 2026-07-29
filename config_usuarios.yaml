@@ -1,50 +1,37 @@
-cookie:
-  expiry_days: 30
-  key: gdd_achs_cookie_key_2026
-  name: gdd_auth
-credentials:
-  usernames:
-    Javiera Cabalin:
-      email: jicabalinf@achs.cl
-      name: J. Cabalin
-      password: $2b$12$1m2ICdrVWHQNE6V/iJQUn.0QXXvd7Z2hN4UpKc.XnRZ8Xv9RTt/yK
-      rol: admin
-      subgerencia: null
-      territorio: null
-    cata:
-      email: charayay@achs.cl
-      name: Catalina Araya
-      password: $2b$12$MrvaS3etrGnggKLYDDvKiOlZvW5zfOuqXYrggpDkkUAzntT1NecYm
-      rol: admin
-      subgerencia: null
-      territorio: null
-    laura_sierra:
-      email: lcsierras@achs.cl
-      name: Laura Sierra
-      password: $2b$12$WnZLwoK21sVPUZugd4bj5.HMalK7/xMffcKZXKrrBi7tzewGdAYXa
-      rol: jefatura
-      subgerencia: SGMP0001
-      territorio: SGMP0001
-    terr_metro:
-      email: rmunita@achs.cl
-      name: Territorial Metropo
-      password: $2b$12$6M5BerBn4umZhKqzk3x00uV5A8Rk77C4rNLEDBPHLusrMetdEDjLy
-      rol: jefatura
-      subgerencia: null
-      territorio: GRTR1010
-    terr_norte:
-      email: pariojaz@achs.cl
-      name: Territorial Norte
-      password: $2b$12$1EcHd2CzxhoxHoynf1mNM.qTzDdwg05BKU7xZWTThsQXvfFPXsWE2
-      rol: jefatura
-      subgerencia: null
-      territorio: GRTR1020
-    terr_sur:
-      email: jbaumann@achs.cl
-      name: Territorial Sur
-      password: $2b$12$yZKyFd19N56pVzyjyyJ1F.fzPF/9sBn1EsLwXt.eihwEg3dJhvWlS
-      rol: jefatura
-      subgerencia: null
-      territorio: GRTR1030
-pre-authorized:
-  emails: []
+usuarios:
+  admin:
+    name: Administrador
+    password: $2b$12$sw2iUUFay8xhuvjKrV6KROqKWFt5wkN5Q3lO6wnjwKilRWjehfXHm
+    rol: admin
+    subgerencia: null
+    territorio: null
+  jcabalin:
+    name: J. Cabalin
+    password: $2b$12$nKUiBmg7z2/NLOd49liFZ.jWZ1zl0VOeRLhJs2ywBQksL8.vO7lI2
+    rol: admin
+    subgerencia: null
+    territorio: null
+  laura_sierra:
+    name: Laura Sierra
+    password: $2b$12$xG.X2cQqe18K5CqXBTBqs.mzCnkgOuwVSObHyfQtIxI1YZRvW31mW
+    rol: jefatura
+    subgerencia: SGMP0001
+    territorio: SGMP0001
+  terr_metro:
+    name: Territorial Metropo
+    password: $2b$12$TQe6xwhxulqHZMcrpTzek.nRpUwp1h7Elond4ofZTZcHR9xjKTOWq
+    rol: jefatura
+    subgerencia: null
+    territorio: GRTR1010
+  terr_norte:
+    name: Territorial Norte
+    password: $2b$12$vTaY8qxhkw7rx7GkkJGKzO8X2Bvwqp/BZbehdCdxCOMLJAS46ySVS
+    rol: jefatura
+    subgerencia: null
+    territorio: GRTR1020
+  terr_sur:
+    name: Territorial Sur
+    password: $2b$12$H5EdrP7uG6wUW.OIQ3BLBe4EF9hzoSMkYGPkkCGDohsRl6kNPnP1G
+    rol: jefatura
+    subgerencia: null
+    territorio: GRTR1030
