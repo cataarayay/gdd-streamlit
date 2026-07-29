@@ -21,7 +21,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# === COLUMNAS ===
 COL_NIVEL='nivel'; COL_CARTERA='cartera_nivel'; COL_NOMBRE='nombre_nivel'
 COL_BP='bp_sucursal'; COL_RUT='rut_empresa'; COL_RAZON='razon_social'
 COL_GTE='cartera_gte'; COL_GTE_NOM='nombre_gte'
@@ -47,12 +46,11 @@ F = {
     'MTD': {'meta_ctp':'meta_ctp_mtd','real_ctp':'real_ctp_mtd'},
     'YTD': {'meta_ctp':'meta_ctp_ytd','real_ctp':'real_ctp_ytd'},
 }
-
 PERIODOS_ORDEN = ['MC','MTD','YTD']
 
 ALL_METRIC_COLS = []
-for per in PERIODOS_ORDEN:
-    ALL_METRIC_COLS += list(S[per].values()) + list(F[per].values())
+for _p in PERIODOS_ORDEN:
+    ALL_METRIC_COLS += list(S[_p].values()) + list(F[_p].values())
 ALL_METRIC_COLS = list(set(ALL_METRIC_COLS))
 
 def get_mc_label(df):
@@ -63,14 +61,12 @@ def get_mc_label(df):
             mes_ant = dt.month - 1 if dt.month > 1 else 12
             anio = dt.year if dt.month > 1 else dt.year - 1
             return f"{anio}{mes_ant:02d}"
-        except:
-            pass
+        except: pass
     return "MC"
 
 def plabel(per, mc_label):
     return mc_label if per == 'MC' else per
 
-# === AUTH ===
 CONFIG_PATH = "config_usuarios.yaml"
 DATA_FILE = "datos_accidentabilidad.csv"
 
@@ -110,7 +106,6 @@ user_rol = ui.get('rol', 'experto')
 user_territorio = ui.get('territorio')
 user_subgerencia = ui.get('subgerencia')
 
-# === FUNCIONES ===
 @st.cache_data
 def cargar_datos():
     if os.path.exists(DATA_FILE):
@@ -125,18 +120,9 @@ def to_float(series):
 def safe_sum(df, col):
     return to_float(df[col]).sum() if col in df.columns else 0
 
-def safe_first(df, col):
-    if col in df.columns:
-        v = to_float(df[col])
-        vals = v[v != 0]
-        return vals.iloc[0] if len(vals) > 0 else (v.iloc[0] if len(v) > 0 else 0)
-    return 0
-
 def semaforo(real, meta):
-    try:
-        r, m = float(real), float(meta)
-    except (ValueError, TypeError):
-        return "⚪"
+    try: r, m = float(real), float(meta)
+    except (ValueError, TypeError): return "⚪"
     if m == 0: return "⚪"
     ratio = r / m
     if ratio <= 0.9: return "🟢"
@@ -144,10 +130,8 @@ def semaforo(real, meta):
     return "🔴"
 
 def cumpl(real, meta):
-    try:
-        r, m = float(real), float(meta)
-    except (ValueError, TypeError):
-        return "—"
+    try: r, m = float(real), float(meta)
+    except (ValueError, TypeError): return "—"
     if m == 0: return "—"
     return f"{(r/m)*100:.0f}%"
 
@@ -172,8 +156,7 @@ def agrupar(df, group_col, name_col):
     df = df.copy()
     agg_dict = {}
     for col in ALL_METRIC_COLS:
-        if col in df.columns:
-            df[col] = to_float(df[col])
+        if col in df.columns: df[col] = to_float(df[col])
     for per in PERIODOS_ORDEN:
         for key, col in S[per].items():
             if col in df.columns: agg_dict[col] = 'sum'
@@ -184,13 +167,11 @@ def agrupar(df, group_col, name_col):
     return df.groupby(group_col, dropna=False).agg(agg_dict).reset_index()
 
 def build_tabla_acc(grouped, group_col, name_col, label, mc_label):
-    """Tabla Accidentes Totales: 🟡 782 / 811 (96%) por período + Fat/Grav YTD"""
     t = pd.DataFrame()
     if name_col and name_col in grouped.columns and name_col != group_col:
         t[label] = grouped[name_col].astype(str)
     else:
         t[label] = grouped[group_col].astype(str)
-
     for per in PERIODOS_ORDEN:
         s = S[per]
         pl = plabel(per, mc_label)
@@ -202,13 +183,11 @@ def build_tabla_acc(grouped, group_col, name_col, label, mc_label):
                 pct = cumpl(acc, meta)
                 return f"{sem} {acc:,} / {meta:,} ({pct})"
             t[f'{pl}'] = grouped.apply(fmt_acc, axis=1)
-
     ytd_s = S['YTD']
     if ytd_s['fatales'] in grouped.columns:
         t['Fat YTD'] = grouped[ytd_s['fatales']].astype(int)
     if ytd_s['graves'] in grouped.columns:
         t['Grav YTD'] = grouped[ytd_s['graves']].astype(int)
-
     mc_col = plabel('MC', mc_label)
     if mc_col in t.columns:
         t['_sort'] = grouped[S['MC']['acc']].astype(float) if S['MC']['acc'] in grouped.columns else 0
@@ -216,13 +195,11 @@ def build_tabla_acc(grouped, group_col, name_col, label, mc_label):
     return t
 
 def build_tabla_ctp(grouped, group_col, name_col, label, mc_label):
-    """Tabla CTP: 🟢 745 / 893 (83%) por período + DP"""
     t = pd.DataFrame()
     if name_col and name_col in grouped.columns and name_col != group_col:
         t[label] = grouped[name_col].astype(str)
     else:
         t[label] = grouped[group_col].astype(str)
-
     for per in PERIODOS_ORDEN:
         f_per = F[per]
         pl = plabel(per, mc_label)
@@ -234,13 +211,11 @@ def build_tabla_ctp(grouped, group_col, name_col, label, mc_label):
                 pct = cumpl(real, meta)
                 return f"{sem} {real:,} / {meta:,} ({pct})"
             t[f'{pl}'] = grouped.apply(fmt_ctp, axis=1)
-
     for per in PERIODOS_ORDEN:
         s = S[per]
         pl = plabel(per, mc_label)
         if s['dp'] in grouped.columns:
             t[f'DP {pl}'] = grouped[s['dp']].astype(int)
-
     mc_col = plabel('MC', mc_label)
     if mc_col in t.columns:
         t['_sort'] = grouped[F['MC']['real_ctp']].astype(float) if F['MC']['real_ctp'] in grouped.columns else 0
@@ -255,8 +230,7 @@ def build_top_empresas(df_nivel, p_key, tipo_cartera, n=10):
         col_acc, col_ctp, col_dp = s['acc_fid'], s.get('ctp_fid'), s.get('dp_fid')
     else:
         col_acc, col_ctp, col_dp = s['acc'], s['ctp'], s['dp']
-    if col_acc not in df_nivel.columns:
-        return pd.DataFrame()
+    if col_acc not in df_nivel.columns: return pd.DataFrame()
     df = df_nivel.copy()
     df[col_acc] = to_float(df[col_acc])
     df = df[df[col_acc] > 0].sort_values(col_acc, ascending=False).head(n)
@@ -265,10 +239,8 @@ def build_top_empresas(df_nivel, p_key, tipo_cartera, n=10):
     if COL_RUT in df.columns: display['RUT'] = df[COL_RUT].astype(str)
     if COL_BP in df.columns: display['BP Suc'] = df[COL_BP].astype(str)
     display['Acc'] = df[col_acc].astype(int)
-    if col_ctp and col_ctp in df.columns:
-        display['CTP'] = to_float(df[col_ctp]).astype(int)
-    if col_dp and col_dp in df.columns:
-        display['DP'] = to_float(df[col_dp]).astype(int)
+    if col_ctp and col_ctp in df.columns: display['CTP'] = to_float(df[col_ctp]).astype(int)
+    if col_dp and col_dp in df.columns: display['DP'] = to_float(df[col_dp]).astype(int)
     if COL_GTE_NOM in df.columns: display['Territorio'] = df[COL_GTE_NOM].astype(str)
     if COL_SUBG_NOM in df.columns: display['Subgerencia'] = df[COL_SUBG_NOM].astype(str)
     if COL_AGENCIA in df.columns: display['Agencia'] = df[COL_AGENCIA].astype(str)
@@ -298,7 +270,6 @@ def render_resumen(df_nivel, group_col, mc_label):
         else:
             r['meta_ctp'] = 0; r['real_ctp'] = 0
         resumen[per] = r
-
     cols = st.columns(3)
     for i, per in enumerate(PERIODOS_ORDEN):
         r = resumen[per]
@@ -311,7 +282,6 @@ def render_resumen(df_nivel, group_col, mc_label):
             st.metric(f"CTP {sem_ctp}", fmt(r['ctp']), f"Real: {fmt(r['real_ctp'])} / Meta: {fmt(r['meta_ctp'])}")
             st.caption(f"DP: {fmt(r['dp'])} · Graves: {fmt(r['graves'])} · Fatales: {fmt(r['fatales'])}")
 
-# === SIDEBAR ===
 with st.sidebar:
     st.markdown("### 🟢 GDD ACHS")
     st.markdown(f"**{user_name}**  \n`{user_rol.upper()}`")
@@ -323,15 +293,11 @@ with st.sidebar:
         st.session_state.username = None
         st.rerun()
 
-# === HEADER ===
 df = cargar_datos()
 fecha = obtener_fecha(df) if df is not None else "—"
 mc_label = get_mc_label(df) if df is not None else "MC"
 st.markdown(f'<div class="main-header"><div><h2>Mi equipo: {equipo_label()}</h2><div class="sub">{user_name} · {user_rol.capitalize()} · Actualización: {fecha}</div></div></div>', unsafe_allow_html=True)
 
-# =====================================================================
-# ACCIDENTABILIDAD
-# =====================================================================
 if seccion == "📊 Accidentabilidad":
     if df is None:
         st.info("No hay datos cargados. Ve a **⚙️ Cargar datos**.")
@@ -349,14 +315,11 @@ if seccion == "📊 Accidentabilidad":
     else:
         df_equipo = df_gte
         equipo_group = COL_GTE
-
     render_resumen(df_equipo, equipo_group, mc_label)
     st.divider()
 
-    # --- FILTROS ---
     st.subheader("Explorar por jerarquía")
     f1, f2, f3, f4 = st.columns(4)
-
     with f1:
         ter_nombres = df_gte.groupby(COL_GTE)[COL_GTE_NOM].first().dropna().to_dict()
         ter_ops = ["Nacional"] + [f"{ter_nombres.get(t,t)} ({t})" for t in sorted(ter_nombres.keys())] + ["MIPE (SGMP0001)"]
@@ -405,7 +368,7 @@ if seccion == "📊 Accidentabilidad":
     if is_mipe:
         st.markdown('<div class="mipe-banner">📋 Vista MIPE — Subgerencia SGMP0001</div>', unsafe_allow_html=True)
 
-   # === VISTA ===
+    # === VISTA ===
     if sel_jgc_cod:
         df_show = get_nivel(df, 'EXPERTO')[lambda d: d[COL_JGC]==sel_jgc_cod]
         grouped = agrupar(df_show, COL_EXP, COL_EXP_NOM)
@@ -434,11 +397,41 @@ if seccion == "📊 Accidentabilidad":
         gc, nc, lb = COL_AGENCIA, None, "Agencia MIPE"
         nivel_empresas = 'AGENCIA_MIPE'; filtro_empresas = {COL_SUBG: 'SGMP0001'}
     else:
+        gc = None
+        nivel_empresas = 'GTE'; filtro_empresas = {}
+
+    # === TABLAS ===
+    if gc is not None:
+        display_acc = build_tabla_acc(grouped, gc, nc, lb, mc_label)
+        display_ctp = build_tabla_ctp(grouped, gc, nc, lb, mc_label)
+    else:
+        # Nacional: territorios + MIPE
         grouped_ter = agrupar(df_gte.dropna(subset=[COL_GTE]), COL_GTE, COL_GTE_NOM)
         df_mipe = get_nivel(df, 'AGENCIA_MIPE')[lambda d: d[COL_SUBG]=='SGMP0001']
         grouped_mipe = agrupar(df_mipe, COL_SUBG, COL_SUBG_NOM)
 
-    
+        display_acc_ter = build_tabla_acc(grouped_ter, COL_GTE, COL_GTE_NOM, "Territorio", mc_label)
+        display_acc_mipe = build_tabla_acc(grouped_mipe, COL_SUBG, COL_SUBG_NOM, "Territorio", mc_label)
+        if len(display_acc_mipe) > 0:
+            display_acc_mipe.iloc[0, display_acc_mipe.columns.get_loc("Territorio")] = "MIPE (SGMP0001)"
+        for col in display_acc_ter.columns:
+            if col not in display_acc_mipe.columns: display_acc_mipe[col] = 0
+        display_acc = pd.concat([display_acc_ter, display_acc_mipe[display_acc_ter.columns]], ignore_index=True)
+
+        display_ctp_ter = build_tabla_ctp(grouped_ter, COL_GTE, COL_GTE_NOM, "Territorio", mc_label)
+        display_ctp_mipe = build_tabla_ctp(grouped_mipe, COL_SUBG, COL_SUBG_NOM, "Territorio", mc_label)
+        if len(display_ctp_mipe) > 0:
+            display_ctp_mipe.iloc[0, display_ctp_mipe.columns.get_loc("Territorio")] = "MIPE (SGMP0001)"
+        for col in display_ctp_ter.columns:
+            if col not in display_ctp_mipe.columns: display_ctp_mipe[col] = 0
+        display_ctp = pd.concat([display_ctp_ter, display_ctp_mipe[display_ctp_ter.columns]], ignore_index=True)
+
+    st.markdown(f'<div class="section-title">Accidentes Totales — {len(display_acc)} filas</div>', unsafe_allow_html=True)
+    st.dataframe(display_acc, use_container_width=True, height=min(400, 45 + len(display_acc) * 35), hide_index=True)
+
+    st.markdown(f'<div class="section-title">Accidentes CTP</div>', unsafe_allow_html=True)
+    st.dataframe(display_ctp, use_container_width=True, height=min(400, 45 + len(display_ctp) * 35), hide_index=True)
+
     # === TOP 10 EMPRESAS ===
     st.divider()
     st.subheader("🏢 Top 10 empresas con más accidentes")
