@@ -266,7 +266,7 @@ def build_top_empresas(df_nivel, p_key, tipo_cartera, n=10):
     return display
 
 def render_resumen(df_nivel, group_col):
-    """Tarjetas resumen con los 3 períodos."""
+    """Tarjetas resumen: Acc Total y CTP grandes, resto compacto abajo."""
     resumen = {}
     for per in ['MTD','MC','YTD']:
         s_p, f_p = S[per], F[per]
@@ -279,17 +279,16 @@ def render_resumen(df_nivel, group_col):
             'fatales': safe_sum(df_nivel, s_p['fatales']),
         }
         if f_p['meta_ctp'] in df_nivel.columns and group_col in df_nivel.columns:
-            df_nivel_copy = df_nivel.copy()
-            df_nivel_copy[f_p['meta_ctp']] = to_float(df_nivel_copy[f_p['meta_ctp']])
-            df_nivel_copy[f_p['real_ctp']] = to_float(df_nivel_copy[f_p['real_ctp']])
-            ctp_grp = df_nivel_copy.groupby(group_col).agg({f_p['meta_ctp']:'first', f_p['real_ctp']:'first'})
+            df_c = df_nivel.copy()
+            df_c[f_p['meta_ctp']] = to_float(df_c[f_p['meta_ctp']])
+            df_c[f_p['real_ctp']] = to_float(df_c[f_p['real_ctp']])
+            ctp_grp = df_c.groupby(group_col).agg({f_p['meta_ctp']:'first', f_p['real_ctp']:'first'})
             r['meta_ctp'] = ctp_grp[f_p['meta_ctp']].sum()
             r['real_ctp'] = ctp_grp[f_p['real_ctp']].sum()
         else:
-            r['meta_ctp'] = 0
-            r['real_ctp'] = 0
+            r['meta_ctp'] = 0; r['real_ctp'] = 0
         resumen[per] = r
-    
+
     cols = st.columns(3)
     for i, per in enumerate(['MTD','MC','YTD']):
         r = resumen[per]
@@ -299,10 +298,7 @@ def render_resumen(df_nivel, group_col):
             sem_ctp = semaforo(r['real_ctp'], r['meta_ctp'])
             st.metric(f"Acc Total {sem_acc}", fmt(r['acc']), f"Meta: {fmt(r['meta'])} ({cumpl(r['acc'], r['meta'])})")
             st.metric(f"CTP {sem_ctp}", fmt(r['ctp']), f"Real: {fmt(r['real_ctp'])} / Meta: {fmt(r['meta_ctp'])}")
-            st.metric("DP", fmt(r['dp']))
-            mc1, mc2 = st.columns(2)
-            with mc1: st.metric("Graves", fmt(r['graves']))
-            with mc2: st.metric("Fatales", fmt(r['fatales']))
+            st.caption(f"DP: {fmt(r['dp'])} · Graves: {fmt(r['graves'])} · Fatales: {fmt(r['fatales'])}")
 
 # === SIDEBAR ===
 with st.sidebar:
