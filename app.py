@@ -425,27 +425,7 @@ if seccion == "📊 Accidentabilidad":
     st.markdown(f'<div class="section-title">Accidentes Totales — {len(display)} filas</div>', unsafe_allow_html=True)
     st.dataframe(display, use_container_width=True, height=min(500, 45 + len(display) * 35), hide_index=True)
 
-    # === DETALLE POR FILA ===
-    if 0 < len(display) <= 20:
-        first_col = display.columns[0]
-        for _, row in display.iterrows():
-            nombre = row[first_col]
-            with st.expander(f"📋 Detalle: {nombre}"):
-                dc1, dc2, dc3 = st.columns(3)
-                for i, per in enumerate(PERIODOS_ORDEN):
-                    pl = plabel(per, mc_label)
-                    with [dc1,dc2,dc3][i]:
-                        st.markdown(f"**{pl}**")
-                        acc_v = row.get(f'Acc {pl}', 0)
-                        meta_v = row.get(f'Meta {pl}', 0)
-                        pct_v = row.get(f'% {pl}', '—')
-                        st.write(f"Acc: **{acc_v}** / Meta: **{meta_v}** → **{pct_v}**")
-                ctp_col = f'CTP {mc_label}'
-                if ctp_col in row:
-                    st.write(f"CTP {mc_label}: **{row.get(ctp_col,0)}** · Real CTP: **{row.get('Real CTP',0)}** · Meta CTP: **{row.get('Meta CTP',0)}**")
-                if 'DP YTD' in row:
-                    st.write(f"DP YTD: **{row.get('DP YTD',0)}** · Graves YTD: **{row.get('Grav YTD',0)}** · Fatales YTD: **{row.get('Fat YTD',0)}**")
-
+   
     # === TOP 10 EMPRESAS ===
     st.divider()
     st.subheader("🏢 Top 10 empresas con más accidentes")
