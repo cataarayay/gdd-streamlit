@@ -11,9 +11,9 @@ credentials:
       rol: admin
       subgerencia: null
       territorio: null
-    admin:
-      email: admin@achs.cl
-      name: Administrador
+    cata:
+      email: charayay@achs.cl
+      name: Catalina Araya
       password: $2b$12$4gTQn2Wb7MKN0UGhggxba.PiTRo97xwAqDdm9LzSzzwDQifpylwvu
       rol: admin
       subgerencia: null
