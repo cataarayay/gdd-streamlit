@@ -107,7 +107,10 @@ def safe_first(df, col):
     return 0
 
 def semaforo(real, meta):
-    r, m = float(real), float(meta)
+    try:
+        r, m = float(real), float(meta)
+    except (ValueError, TypeError):
+        return "⚪"
     if m == 0: return "⚪"
     ratio = r / m
     if ratio <= 0.9: return "🟢"
