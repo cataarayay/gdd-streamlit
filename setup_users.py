@@ -21,30 +21,20 @@ def hash_password(password):
 
 # ============================================================
 #  EDITAR USUARIOS AQUÍ
-#  Copiar el bloque y ajustar para cada usuario nuevo.
-#  Campos:
-#    name         → Nombre completo
-#    email        → Email ACHS
-#    password     → hash_password("clave")
-#    rol          → "admin" | "jefatura" | "experto"
-#    territorio   → código GTE o None para nacional
-#    subgerencia  → código SUBG o None para todo el territorio
 # ============================================================
 
 usuarios = {
 
     # ---- ADMINISTRADORES ----
-    "cata": {
-        "name": "Catalina Arayay",
-        "email": "carayay@achs.cl",
-        "password": hash_password("admin2026"),
+    "admin": {
+        "name": "Administrador",
+        "password": hash_password("admin123"),
         "rol": "admin",
         "territorio": None,
         "subgerencia": None,
     },
-    "diego": {
-        "name": "Diego (BI)",
-        "email": "diego@achs.cl",
+    "jcabalin": {
+        "name": "J. Cabalin",
         "password": hash_password("admin2026"),
         "rol": "admin",
         "territorio": None,
@@ -52,25 +42,22 @@ usuarios = {
     },
 
     # ---- JEFATURAS TERRITORIO ----
-    "jef_metro": {
-        "name": "Jefatura Metropolitano",
-        "email": "jef.metro@achs.cl",
+    "terr_metro": {
+        "name": "Territorial Metropo",
         "password": hash_password("metro2026"),
         "rol": "jefatura",
         "territorio": "GRTR1010",
         "subgerencia": None,
     },
-    "jef_norte": {
-        "name": "Jefatura Norte",
-        "email": "jef.norte@achs.cl",
+    "terr_norte": {
+        "name": "Territorial Norte",
         "password": hash_password("norte2026"),
         "rol": "jefatura",
         "territorio": "GRTR1020",
         "subgerencia": None,
     },
-    "jef_sur": {
-        "name": "Jefatura Sur",
-        "email": "jef.sur@achs.cl",
+    "terr_sur": {
+        "name": "Territorial Sur",
         "password": hash_password("sur2026"),
         "rol": "jefatura",
         "territorio": "GRTR1030",
@@ -80,35 +67,19 @@ usuarios = {
     # ---- JEFATURA MIPE ----
     "laura_sierra": {
         "name": "Laura Sierra",
-        "email": "lsierra@achs.cl",
         "password": hash_password("mipe2026"),
         "rol": "jefatura",
         "territorio": "SGMP0001",
         "subgerencia": "SGMP0001",
     },
 
-    # ---- EJEMPLOS JEFATURA SUBGERENCIA ----
-    # (Duplicar y ajustar para cada subgerencia real)
-    #
-    # "jef_subg_ejemplo": {
-    #     "name": "Jefe Subgerencia X",
-    #     "email": "jsubgx@achs.cl",
+    # ---- AGREGAR MÁS USUARIOS AQUÍ ----
+    # "usuario_nuevo": {
+    #     "name": "Nombre Completo",
     #     "password": hash_password("clave123"),
     #     "rol": "jefatura",
     #     "territorio": "GRTR1010",
-    #     "subgerencia": "SGM01010",
-    # },
-
-    # ---- EJEMPLOS EXPERTO ----
-    # (Duplicar y ajustar para cada experto)
-    #
-    # "exp_ejemplo": {
-    #     "name": "Experto Ejemplo",
-    #     "email": "exp@achs.cl",
-    #     "password": hash_password("clave123"),
-    #     "rol": "experto",
-    #     "territorio": "GRTR1010",
-    #     "subgerencia": "SGM01010",
+    #     "subgerencia": None,
     # },
 }
 
@@ -116,15 +87,7 @@ usuarios = {
 #  NO EDITAR DEBAJO DE ESTA LÍNEA
 # ============================================================
 
-config = {
-    "credentials": {"usernames": usuarios},
-    "cookie": {
-        "expiry_days": 30,
-        "key": "gdd_achs_cookie_key_2026",
-        "name": "gdd_auth",
-    },
-    "pre-authorized": {"emails": []},
-}
+config = {"usuarios": usuarios}
 
 with open("config_usuarios.yaml", "w", encoding="utf-8") as f:
     yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
