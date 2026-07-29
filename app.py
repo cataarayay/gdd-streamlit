@@ -114,7 +114,9 @@ def semaforo(real, meta):
     elif ratio <= 1.0: return "🟡"
     return "🔴"
 
-def fmt(val): return f"{int(val):,}"
+def fmt(val):
+    try: return f"{int(float(val)):,}"
+    except: return "0"
 
 def obtener_fecha(df):
     if COL_FECHA in df.columns:
