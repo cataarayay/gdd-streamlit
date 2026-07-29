@@ -436,7 +436,7 @@ if seccion == "📊 Accidentabilidad":
     else:
         grouped_ter = agrupar(df_gte.dropna(subset=[COL_GTE]), COL_GTE, COL_GTE_NOM)
         df_mipe = get_nivel(df, 'AGENCIA_MIPE')[lambda d: d[COL_SUBG]=='SGMP0001']
-        grouped_mipe =
+        grouped_mipe = agrupar(df_mipe, COL_SUBG, COL_SUBG_NOM)
 
     
     # === TOP 10 EMPRESAS ===
